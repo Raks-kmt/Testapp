@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>ExamPro - Online Test Series Platform</title>
     <style>
-        /* CSS - Bilkul waisa hi jaisa aapko chahiye (Lakshya Style) */
+        /* CSS - Bilkul waisa hi jaisa aapko chahiye */
         :root { --bg: #f0f2f5; --surface: #ffffff; --surface2: #f8f9fa; --glass: rgba(255,255,255,0.75); --glass2: rgba(255,255,255,0.5); --border: rgba(0,0,0,0.08); --text: #1a1a2e; --text2: #555; --primary: #4f46e5; --primary2: #6366f1; --accent: #8b5cf6; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --shadow: 0 4px 24px rgba(0,0,0,0.06); --shadow2: 0 8px 40px rgba(0,0,0,0.1); --radius: 16px; --radius2: 12px; --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); --sidebar-w: 260px; --card-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --touch-target: 44px; --palette-width: 280px; }
         .dark { --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #16162a; --glass: rgba(26,26,46,0.8); --glass2: rgba(20,20,40,0.6); --border: rgba(255,255,255,0.06); --text: #e8e8f0; --text2: #aab; --shadow: 0 4px 24px rgba(0,0,0,0.3); --shadow2: 0 8px 40px rgba(0,0,0,0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -35,6 +35,518 @@
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
         .stat-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 8px; text-align: center; transition: all var(--transition); cursor: default; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
+        .stat-card .stat-value { font-size: 1.6rem; font-weight: 800; background: var(--card-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .btn { padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px; min-height: var(--touch-target); justify-content: center; }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 16px rgba(79,70,229,0.3); }
+        .btn-primary:hover { background: var(--primary2); transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; border-radius: 8px; min-height: 32px; }
+        .btn-lg { padding: 12px 24px; font-size: 1rem; border-radius: 12px; min-height: 48px; }
+        input, textarea, select { width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--surface2); color: var(--text); transition: all var(--transition); min-height: var(--touch-target); }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79,70,229,0.1); }
+        .form-group { margin-bottom: 12px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 12px; animation: fadeIn 0.25s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal { background: var(--surface); border-radius: var(--radius); padding: 20px; max-width: 750px; width: 98vw; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow2); animation: slideUp 0.3s; }
+        .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 500px; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { background: var(--surface2); font-weight: 700; position: sticky; top: 0; color: var(--text2); }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .dark .badge-success { background: #064e3b; color: #a7f3d0; }
+        .dark .badge-danger { background: #7f1d1d; color: #fecaca; }
+        .dark .badge-warning { background: #78350f; color: #fde68a; }
+        .dark .badge-info { background: #1e3a5f; color: #bfdbfe; }
+        .timer-display { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
+        .timer-warning { color: #fca5a5 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .palette-btn { width: 34px; height: 34px; border-radius: 8px; border: 2px solid var(--border); background: var(--surface2); cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: all var(--transition); color: var(--text); touch-action: manipulation; flex-shrink: 0; }
+        .palette-btn.answered { background: #10b981; color: #fff; border-color: #10b981; }
+        .palette-btn.review { background: #8b5cf6; color: #fff; border-color: #8b5cf6; }
+        .hidden { display: none !important; }
+        .flex-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 12px; }
+        .full-width { width: 100%; }
+        .toast { position: fixed; top: 16px; right: 16px; background: var(--surface); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; z-index: 9999; box-shadow: var(--shadow2); animation: slideIn 0.3s; font-weight: 500; max-width: 90vw; font-size: 0.9rem; }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+        .switch-theme { width: 44px; height: 24px; background: #ccc; border-radius: 24px; cursor: pointer; position: relative; transition: background var(--transition); border: none; }
+        .switch-theme::after { content: ''; position: absolute; width: 20px; height: 20px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: transform var(--transition); }
+        .dark .switch-theme { background: var(--primary); }
+        .dark .switch-theme::after { transform: translateX(20px); }
+        .hamburger { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--text); padding: 4px 8px; min-height: var(--touch-target); display: none; touch-action: manipulation; }
+        .test-wrapper { background: #f5f7fb; min-height: calc(100vh - 60px); display: flex; flex-direction: column; position: relative; overflow-x: hidden; padding-bottom: 80px; }
+        .dark .test-wrapper { background: #15152a; }
+        .test-header { background: #5a4fcf; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 16px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px; position: sticky; top: 0; z-index: 10; }
+        .test-header .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; }
+        .test-header .brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .test-header .timer-pill { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .test-header .header-icons { display: flex; gap: 10px; }
+        .test-header .header-icons button { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 4px; min-height: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center; }
+        .question-area { flex: 1; padding: 0 16px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .question-card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+        .dark .question-card { background: var(--surface2); }
+        .question-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+        .option-item { display: flex; align-items: center; padding: 14px 16px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius2); background: var(--surface2); cursor: pointer; transition: all var(--transition); gap: 12px; }
+        .option-item:hover { border-color: var(--primary); }
+        .option-item .opt-num { width: 28px; height: 28px; border-radius: 50%; background: #eef0f5; color: #555; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0; }
+        .dark .option-item .opt-num { background: #2a2a40; color: #aab; }
+        .option-item.selected { border-color: var(--primary); background: rgba(79,70,229,0.08); }
+        .option-item.selected .opt-num { background: var(--primary); color: #fff; }
+        .option-item.correct-show { border-color: #10b981 !important; background: rgba(16,185,129,0.1) !important; }
+        .option-item.correct-show .opt-num { background: #10b981 !important; color: #fff !important; }
+        .option-item.wrong-show { border-color: #ef4444 !important; background: rgba(239,68,68,0.1) !important; }
+        .option-item.wrong-show .opt-num { background: #ef4444 !important; color: #fff !important; }
+        .option-item .opt-icon { margin-left: auto; font-size: 1.1rem; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .dark .bottom-nav { background: var(--surface2); }
+        .nav-btn { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border); background: transparent; color: var(--text2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: all var(--transition); touch-action: manipulation; }
+        .nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav-btn.star-btn { width: 56px; height: 56px; background: #f59e0b; border-color: #f59e0b; color: #fff; font-size: 1.4rem; box-shadow: 0 4px 12px rgba(245,158,11,0.3); }
+        .palette-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+        .palette-modal-overlay.active { display: flex; }
+        .palette-modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; max-height: 80vh; overflow-y: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); animation: slideUp 0.3s; }
+        .palette-modal .pm-header { background: #5a4fcf; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 20px 20px 0 0; position: sticky; top: 0; z-index: 2; }
+        .palette-modal .pm-header h4 { font-size: 1.1rem; font-weight: 600; }
+        .palette-modal .pm-header button { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; min-height: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center; }
+        .palette-modal .pm-body { padding: 16px 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 10px; }
+        .palette-modal .pm-btn { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface2); color: var(--text2); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all var(--transition); display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .palette-modal .pm-btn.answered { background: #5a4fcf; border-color: #5a4fcf; color: #fff; }
+        .palette-modal .pm-btn.current { border-color: #f43f5e; box-shadow: 0 0 0 2px rgba(244,63,94,0.2); }
+        .palette-modal .pm-btn.review { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+        .question-image { max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border); }
+        .feedback-area { margin-top: 16px; padding: 12px 16px; border-radius: var(--radius2); background: var(--glass); border: 1px solid var(--border); display: none; }
+        .feedback-area.visible { display: block; }
+        .feedback-area .fb-correct { color: var(--success); font-weight: 600; }
+        .feedback-area .fb-solution { color: var(--text2); margin-top: 4px; font-size: 0.9rem; }
+        @media (max-width:1024px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .sidebar-close { display: block; } .main-content { margin-left: 0; } .hamburger { display: block; } .test-wrapper { padding-bottom: 80px; } }
+        @media (max-width:480px) { .nav-btn { width: 40px; height: 40px; font-size: 1rem; } .nav-btn.star-btn { width: 48px; height: 48px; font-size: 1.2rem; } .test-header .brand span { max-width: 60px; } }
+    </style>
+</head>
+<body>
+    <div id="app" class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo"><span>📝 ExamPro</span><button class="sidebar-close" onclick="closeSidebar()">✕</button></div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div style="padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0;">
+                <button class="btn btn-outline full-width btn-sm" onclick="toggleTheme()" style="justify-content:center;min-height:38px;"><span id="themeIcon">🌙</span> <span id="themeLabel">Dark Mode</span></button>
+                <button class="btn btn-danger full-width btn-sm mt-2" onclick="handleLogout()" style="justify-content:center;min-height:38px;">🚪 Logout</button>
+            </div>
+        </aside>
+        <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>
+        <main class="main-content" id="mainContent"></main>
+    </div>
+    <div id="globalLoader" class="global-loader"><div class="spinner"></div></div>
+    <div id="toastContainer"></div>
+    <div id="modalContainer"></div>
+
+    <script>
+        const API_BASE = '/api';
+
+        function showToast(msg, type = 'info') {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            t.style.borderLeft = '4px solid ' + (type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6');
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        function showGlobalLoader() { document.getElementById('globalLoader').classList.add('active'); }
+        function hideGlobalLoader() { document.getElementById('globalLoader').classList.remove('active'); }
+        
+        function renderView(html) {
+            const main = document.getElementById('mainContent');
+            showGlobalLoader();
+            // Synchronous DOM update ensures next lines execute after DOM is ready
+            main.innerHTML = html;
+            setTimeout(() => hideGlobalLoader(), 250);
+        }
+
+        const STATE = { currentUser: null, userType: null, currentView: 'login', currentTestId: null, currentQuestionIndex: 0, answers: {}, reviewMarks: {}, timeRemaining: 0, timerInterval: null, violations: { total: 0, exits: 0, tabSwitches: 0 }, darkMode: false, sidebarOpen: false, autoSaveInterval: null, isReattempt: false };
+
+        function toggleTheme() {
+            STATE.darkMode = !STATE.darkMode;
+            document.body.classList.toggle('dark', STATE.darkMode);
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (icon) icon.textContent = STATE.darkMode ? '☀️' : '🌙';
+            if (label) label.textContent = STATE.darkMode ? 'Light Mode' : 'Dark Mode';
+        }
+
+        function toggleSidebar() {
+            STATE.sidebarOpen = !STATE.sidebarOpen;
+            document.getElementById('sidebar').classList.toggle('open', STATE.sidebarOpen);
+            document.getElementById('sidebarBackdrop').classList.toggle('active', STATE.sidebarOpen);
+        }
+        function closeSidebar() {
+            STATE.sidebarOpen = false;
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarBackdrop').classList.remove('active');
+        }
+
+        function updateSidebar(type) {
+            const nav = document.getElementById('sidebarNav');
+            let views = type === 'admin' ? [
+                { view: 'admin_dashboard', label: 'Dashboard', onclick: 'showAdminDashboard()' },
+                { view: 'admin_exams', label: 'Manage Exams', onclick: 'showAdminExams()' },
+                { view: 'admin_students', label: 'Students', onclick: 'showAdminStudents()' },
+                { view: 'admin_results', label: 'Results', onclick: 'showAdminResults()' }
+            ] : [
+                { view: 'student_exams', label: 'Exams', onclick: 'showStudentExams()' },
+                { view: 'my_results', label: 'My Results', onclick: 'showMyResults()' },
+                { view: 'student_profile', label: 'Profile', onclick: 'showStudentProfile()' }
+            ];
+            nav.innerHTML = views.map(v => `<button class="${STATE.currentView === v.view ? 'active' : ''}" onclick="${v.onclick}"><span class="icon">📂</span> ${v.label}</button>`).join('');
+        }
+
+        // ---------------- LOGIN & REGISTER ----------------
+        function showLoginScreen() {
+            STATE.currentView = 'login';
+            document.getElementById('sidebar').classList.add('hidden');
+            renderView(`
+            <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;background:var(--bg);">
+              <div class="glass-card" style="max-width:440px;width:100%;">
+                <h1 style="text-align:center;font-size:1.8rem;background:var(--card-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">📝 ExamPro</h1>
+                <div id="loginFormArea">
+                  <form onsubmit="studentLogin(event)" style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
+                    <div class="form-group"><label>Email</label><input type="text" id="stuLoginId" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="stuLoginPass" required></div>
+                    <button type="submit" class="btn btn-primary btn-lg full-width">🎓 Login as Student</button>
+                    <button type="button" class="btn btn-outline full-width" onclick="showStudentRegister()">📝 New Registration</button>
+                  </form>
+                </div>
+              </div>
+            </div>`);
+        }
+
+        async function studentLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('stuLoginId').value.trim();
+            const password = document.getElementById('stuLoginPass').value.trim();
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, role: 'student' })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    STATE.currentUser = data.user;
+                    STATE.userType = 'student';
+                    showStudentExams();
+                } else {
+                    showToast(data.error, 'error');
+                }
+            } catch (e) { showToast('Error connecting to server. Is Python running?', 'error'); }
+        }
+
+        function showStudentRegister() {
+            document.getElementById('loginFormArea').innerHTML = `
+            <form onsubmit="registerStudent(event)" style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
+              <div class="form-group"><label>Full Name</label><input type="text" id="regName" required></div>
+              <div class="form-group"><label>Mobile</label><input type="text" id="regMobile" required></div>
+              <div class="form-group"><label>Email</label><input type="email" id="regEmail" required></div>
+              <div class="form-group"><label>Password</label><input type="password" id="regPass" required minlength="4"></div>
+              <button type="submit" class="btn btn-success btn-lg full-width">✅ Register</button>
+              <button type="button" class="btn btn-outline full-width" onclick="showLoginScreen()">⬅ Back</button>
+            </form>`;
+        }
+
+        async function registerStudent(e) {
+            e.preventDefault();
+            const data = { name: document.getElementById('regName').value.trim(), mobile: document.getElementById('regMobile').value.trim(), email: document.getElementById('regEmail').value.trim(), password: document.getElementById('regPass').value.trim() };
+            try {
+                const res = await fetch(`${API_BASE}/register/student`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) { showToast('Registered! Please login.', 'success'); showLoginScreen(); }
+                else { showToast(result.error, 'error'); }
+            } catch (e) { showToast('Error connecting to server.', 'error'); }
+        }
+
+        function handleLogout() {
+            STATE.currentUser = null; STATE.userType = null; STATE.currentView = 'login';
+            document.getElementById('sidebar').classList.add('hidden');
+            showLoginScreen();
+        }
+
+        // ---------------- STUDENT DASHBOARD ----------------
+        async function showStudentExams() {
+            STATE.currentView = 'student_exams';
+            document.getElementById('sidebar').classList.remove('hidden');
+            updateSidebar('student');
+            try {
+                const res = await fetch(`${API_BASE}/exams`);
+                let exams = await res.json();
+                exams = exams.filter(e => e.isVisible !== false);
+                let html = `<div class="header-bar"><div class="flex-row"><button class="hamburger" onclick="toggleSidebar()">☰</button><h1>📚 Available Exams</h1></div></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;">`;
+                exams.forEach(exam => {
+                    const visibleTestTypes = (exam.testTypes || []).filter(tt => tt.isVisible !== false);
+                    if (visibleTestTypes.length > 0) {
+                        html += `<div class="student-exam-card" onclick="showStudentTestTypes('${exam._id}')">
+                            <div class="exam-icon">📘</div><div class="exam-name">${exam.name}</div>
+                            <div style="font-size:0.8rem;color:var(--text2);">${visibleTestTypes.length} Test Types</div>
+                        </div>`;
+                    }
+                });
+                html += `</div>`;
+                renderView(html);
+            } catch (e) { showToast('Failed to load exams.', 'error'); }
+        }
+
+        async function showStudentTestTypes(examId) {
+            STATE.currentExamId = examId;
+            const res = await fetch(`${API_BASE}/exams`);
+            const exams = await res.json();
+            const exam = exams.find(e => e._id === examId);
+            const testTypes = (exam?.testTypes || []).filter(tt => tt.isVisible !== false);
+            let html = `<div class="header-bar"><div class="flex-row"><button class="hamburger" onclick="toggleSidebar()">☰</button><button class="btn btn-outline btn-sm" onclick="showStudentExams()">⬅ Back</button><h1>📂 ${exam?.name}</h1></div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;">`;
+            testTypes.forEach(tt => {
+                html += `<div class="student-test-type-card" onclick="showStudentTests('${exam._id}','${tt._id}')">
+                    <div class="tt-icon">📂</div><div class="tt-name">${tt.name}</div>
+                </div>`;
+            });
+            html += `</div>`;
+            renderView(html);
+        }
+
+        async function showStudentTests(examId, testTypeId) {
+            const res = await fetch(`${API_BASE}/exams`);
+            const exams = await res.json();
+            const exam = exams.find(e => e._id === examId);
+            const tt = exam?.testTypes.find(t => t._id === testTypeId);
+            if (!tt) return;
+            const testIds = tt.tests || [];
+            let html = `<div class="header-bar"><div class="flex-row"><button class="hamburger" onclick="toggleSidebar()">☰</button><button class="btn btn-outline btn-sm" onclick="showStudentTestTypes('${examId}')">⬅ Back</button><h1>📝 ${exam.name} - ${tt.name}</h1></div></div>
+            <div class="glass-card"><div class="table-wrap"><table><thead><tr><th>Test Name</th><th>Duration</th><th>Action</th></tr></thead><tbody>`;
+            for (let id of testIds) {
+                const tRes = await fetch(`${API_BASE}/tests/${id}`);
+                const t = await tRes.json();
+                if (t) {
+                    html += `<tr><td><b>${t.name}</b></td><td>${t.duration} min</td><td><button class="btn btn-sm btn-primary" onclick="startTestPrompt('${t._id}')">▶ Start</button></td></tr>`;
+                }
+            }
+            html += `</tbody></table></div></div>`;
+            renderView(html);
+        }
+
+        // ---------------- TEST TAKING ----------------
+        function startTestPrompt(testId) {
+            if (confirm(`Start this test?`)) {
+                startTest(testId);
+            }
+        }
+
+        async function startTest(testId) {
+            const res = await fetch(`${API_BASE}/tests/${testId}`);
+            const test = await res.json();
+            if (!test || !test.questions || test.questions.length === 0) { showToast('Test has no questions!', 'error'); return; }
+            
+            STATE.currentView = 'test';
+            STATE.currentTestId = test;
+            STATE.currentQuestionIndex = 0;
+            STATE.answers = {};
+            STATE.reviewMarks = {};
+            STATE.timeRemaining = test.duration * 60;
+            STATE.isReattempt = false;
+            
+            document.getElementById('sidebar').classList.add('hidden');
+            renderTestInterface(test);
+            startTimer();
+        }
+
+        function renderTestInterface(test) {
+            const qs = test.questions;
+            const qi = STATE.currentQuestionIndex;
+            const q = qs[qi];
+            
+            let optionsHtml = '';
+            const letters = ['1', '2', '3', '4'];
+            const optKeys = ['A', 'B', 'C', 'D'];
+            optKeys.forEach((optKey, idx) => {
+                const val = q['option' + optKey];
+                const isSelected = STATE.answers[q.id] === optKey;
+                let extraClass = '';
+                let iconHtml = '';
+                if (STATE.isReattempt && STATE.answers[q.id] !== undefined) {
+                    if (optKey === q.correctAnswer) { extraClass = ' correct-show'; iconHtml = `<span class="opt-icon">✅</span>`; }
+                    else if (isSelected && optKey !== q.correctAnswer) { extraClass = ' wrong-show'; iconHtml = `<span class="opt-icon">❌</span>`; }
+                }
+                const selectedClass = isSelected ? ' selected' : '';
+                optionsHtml += `<div class="option-item${selectedClass}${extraClass}" onclick="selectAnswer('${q.id}','${optKey}')">
+                    <span class="opt-num">${letters[idx]}</span><span>${val}</span>${iconHtml}
+                </div>`;
+            });
+
+            let paletteHtml = qs.map((qItem, idx) => {
+                let cls = '';
+                if (idx === qi) cls += ' current';
+                if (STATE.answers[qItem.id] && STATE.reviewMarks[qItem.id]) cls += ' answered-review';
+                else if (STATE.answers[qItem.id]) cls += ' answered';
+                else if (STATE.reviewMarks[qItem.id]) cls += ' review';
+                return `<button class="pm-btn ${cls}" onclick="jumpToQuestion(${idx}); closePalette();">${idx+1}</button>`;
+            }).join('');
+
+            const main = document.getElementById('mainContent');
+            main.style.marginLeft = '0';
+            main.innerHTML = `
+            <div class="test-wrapper">
+                <div class="test-header">
+                    <div class="brand"><span>📘 ${test.name}</span></div>
+                    <div class="timer-pill">⏱️ <span id="timerDisplay">${formatTime(STATE.timeRemaining)}</span></div>
+                    <div class="header-icons"><button onclick="togglePalette()">☰</button><button onclick="submitTest()">📤</button></div>
+                </div>
+                <div class="question-area">
+                    <div class="question-card">
+                        <div class="question-text">${q.question}</div>
+                        ${optionsHtml}
+                        <div id="feedbackArea" class="feedback-area">
+                            <div class="fb-correct">✅ Correct Answer: <span id="fbCorrectAnswer"></span></div>
+                            <div class="fb-solution" id="fbSolution"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-nav">
+                    <button class="nav-btn" onclick="prevQuestion()" ${qi===0?'disabled':''}>‹</button>
+                    <button class="nav-btn star-btn ${STATE.reviewMarks[q.id] ? 'active' : ''}" onclick="markForReview()">★</button>
+                    <button class="nav-btn" onclick="nextQuestion()" ${qi>=qs.length-1?'disabled':''}>›</button>
+                </div>
+                <div id="paletteModal" class="palette-modal-overlay" onclick="if(event.target===this) closePalette();">
+                    <div class="palette-modal">
+                        <div class="pm-header"><h4>Questions Navigation</h4><button onclick="closePalette()">✕</button></div>
+                        <div class="pm-body">${paletteHtml}</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function selectAnswer(qId, opt) {
+            STATE.answers[qId] = opt;
+            const test = STATE.currentTestId;
+            if (test) renderTestInterface(test);
+        }
+
+        function markForReview() {
+            const test = STATE.currentTestId;
+            if (!test) return;
+            const q = test.questions[STATE.currentQuestionIndex];
+            STATE.reviewMarks[q.id] = !STATE.reviewMarks[q.id];
+            renderTestInterface(test);
+        }
+
+        function prevQuestion() {
+            if (STATE.currentQuestionIndex > 0) {
+                STATE.currentQuestionIndex--;
+                renderTestInterface(STATE.currentTestId);
+            }
+        }
+        function nextQuestion() {
+            if (STATE.currentQuestionIndex < STATE.currentTestId.questions.length - 1) {
+                STATE.currentQuestionIndex++;
+                renderTestInterface(STATE.currentTestId);
+            }
+        }
+        function jumpToQuestion(idx) {
+            STATE.currentQuestionIndex = idx;
+            renderTestInterface(STATE.currentTestId);
+        }
+        function togglePalette() { document.getElementById('paletteModal').classList.toggle('active'); }
+        function closePalette() { document.getElementById('paletteModal').classList.remove('active'); }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        function startTimer() {
+            if (STATE.timerInterval) clearInterval(STATE.timerInterval);
+            STATE.timerInterval = setInterval(() => {
+                STATE.timeRemaining--;
+                const display = document.getElementById('timerDisplay');
+                if (display) display.textContent = formatTime(STATE.timeRemaining);
+                if (STATE.timeRemaining <= 0) {
+                    clearInterval(STATE.timerInterval);
+                    showToast('⏰ Time up! Auto-submitting...', 'error');
+                    setTimeout(() => submitTest(), 1500);
+                }
+            }, 1000);
+        }
+
+        async function submitTest() {
+            if (STATE.timerInterval) clearInterval(STATE.timerInterval);
+            const test = STATE.currentTestId;
+            const qs = test.questions;
+            let correct = 0, wrong = 0, skipped = 0, score = 0;
+            const questionResults = [];
+            qs.forEach(q => {
+                const userAns = STATE.answers[q.id] || null;
+                const isCorrect = userAns === q.correctAnswer;
+                if (!userAns) skipped++;
+                else if (isCorrect) { correct++; score += test.posMarks; }
+                else { wrong++; score -= test.negMarks; }
+                questionResults.push({ questionId: q.id, question: q.question, userAnswer: userAns, correctAnswer: q.correctAnswer, isCorrect, skipped: !userAns, solution: q.solution || '' });
+            });
+            score = Math.max(0, Math.round(score * 100) / 100);
+            const percentage = Math.round((correct / Math.max(qs.length, 1)) * 10000) / 100;
+            const passed = percentage >= (test.passingMarks || 33);
+            
+            const result = {
+                testId: test._id, studentId: STATE.currentUser._id, studentName: STATE.currentUser.name,
+                score, totalMarks: test.totalMarks || qs.length * test.posMarks, percentage, passed,
+                correct, wrong, skipped, totalQuestions: qs.length, timeUsed: (test.duration * 60) - STATE.timeRemaining,
+                questionResults, violations: STATE.violations
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/results`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(result)
+                });
+                if (res.ok) {
+                    STATE.currentView = 'result';
+                    document.getElementById('sidebar').classList.remove('hidden');
+                    renderView(`<div class="header-bar"><h1>📊 Test Result</h1><button class="btn btn-outline" onclick="showStudentExams()">⬅ Back</button></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-value">${score}/${result.totalMarks}</div><div class="stat-label">Score</div></div>
+                        <div class="stat-card"><div class="stat-value">${percentage}%</div><div class="stat-label">Percentage</div></div>
+                        <div class="stat-card"><div class="stat-value">${passed?'✅ PASS':'❌ FAIL'}</div><div class="stat-label">Result</div></div>
+                    </div>`);
+                }
+            } catch (e) { showToast('Error saving result.', 'error'); }
+        }
+
+        // ---------------- ADMIN OVERVIEW (Simplified) ----------------
+        function showAdminDashboard() {
+            STATE.currentView = 'admin_dashboard';
+            document.getElementById('sidebar').classList.remove('hidden');
+            updateSidebar('admin');
+            renderView(`<div class="header-bar"><h1>🏛️ Admin Dashboard</h1></div>
+            <div class="stats-grid"><div class="stat-card"><div class="stat-value">⚡</div><div class="stat-label">Online Mode Active</div></div></div>
+            <div class="glass-card"><h3>✅ Admin actions available via Backend</h3><p>Use Python API to manage students, tests, and results.</p></div>`);
+        }
+
+        // ---------------- INIT ----------------
+        document.addEventListener('DOMContentLoaded', () => {
+            if (STATE.darkMode) document.body.classList.add('dark');
+            showLoginScreen();
+        });
+    </script>
+</body>
+</html>        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
         .stat-card .stat-value { font-size: 1.6rem; font-weight: 800; background: var(--card-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .btn { padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px; min-height: var(--touch-target); justify-content: center; }
         .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 16px rgba(79,70,229,0.3); }
