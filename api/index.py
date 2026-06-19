@@ -11,7 +11,7 @@ CORS(app)  # Allow frontend to call API
 
 # --- MongoDB Connection (Vercel environment) ---
 # You must set MONGODB_URI in Vercel Environment Variables
-MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/')
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb+srv://technicalprisara:lP4Ql3Jb7XVvgs9x@cluster0.c2h07.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 client = MongoClient(MONGODB_URI)
 db = client['exampro_db']
 
